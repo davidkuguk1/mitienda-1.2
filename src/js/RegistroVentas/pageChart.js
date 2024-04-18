@@ -118,22 +118,27 @@ initMonthlyTotalSales();
 
 /* Ventas por encima de 5000 */
 function findOver5000() {
-	let position = -1;
-	const quantity = monthSales.find((elem, index) => {
-		if (elem > 5000) {
-			position = index;
-			return true;
-		}
-		return false;
-	});
-	alert(`Cantidad: ${quantity} Posición: ${position}`);
-}
+    let over5000Months = []; // Array para almacenar los meses con ventas totales superiores a 5000
 
-function resetMonthlySales() {
-	monthlySalesMap.clear();
-	monthlySalesChart.reset();
-	monthlySalesChart.render();
-	initMonthlyTotalSales();
+    // Iterar sobre el mapa de ventas mensuales
+    for (let [month, amounts] of monthlySalesMap.entries()) {
+        let totalSales = amounts.reduce((total, amount) => total + amount, 0); // Sumar las ventas del mes
+		console.log(tota);
+        if (totalSales > 5000) { // Si las ventas totales del mes superan los 5000, agregar al array
+            over5000Months.push(month);
+        }
+    }
+
+    // Mostrar los meses con ventas totales superiores a 5000
+    if (over5000Months.length > 0) {
+        let message = "Meses con ventas totales superiores a 5000:\n";
+        over5000Months.forEach(month => {
+            message += `${month}\n`;
+        });
+        alert(message);
+    } else {
+        alert("No hay meses con ventas totales superiores a 5000.");
+    }
 }
 
 function checkRadios() {
@@ -256,13 +261,7 @@ function cleanAddSaleForm() {
 	newAmount.value = "";
 }
 
-// //Resetear datos en los gráficos
-// function resetMonthlySales() {
-// 	monthlySalesArray.length = 0;
-// 	monthlyLabelsSet.clear();
-// 	monthlySalesChart.update();
-// 	initMonthlyTotalSales();
-// }
+
 function resetMonthlySales() {
 	// Limpiar el mapa de ventas mensuales
 	monthlySalesMap.clear();
@@ -286,11 +285,29 @@ function resetMonthlySales() {
 
 
 function getSalesMonths() {
-	monthlyLabelsSet.forEach(function (month) {
-		console.dir(month);
-		alert(month);
-	});
+    let over5000Sales = new Map(); // Mapa para almacenar los meses con ventas totales superiores a 5000 y su cantidad
+
+    // Iterar sobre el mapa de ventas mensuales
+    for (let [month, totalSales] of monthlySalesMap.entries()) {
+        if (totalSales > 5000) { // Si las ventas totales del mes superan los 5000, agregar al mapa
+            over5000Sales.set(month, totalSales);
+        }
+    }
+
+    // Mostrar los meses con ventas totales superiores a 5000
+    if (over5000Sales.size > 0) {
+        let message = "Meses con ventas totales superiores a 5000:\n";
+        over5000Sales.forEach((amount, month) => {
+            message += `${month}: ${amount}\n`;
+        });
+        alert(message);
+    } else {
+        alert("No hay meses con ventas totales superiores a 5000.");
+    }
 }
+
+
+
 
 // Función para calcular las ventas totales por categoría
 function calculateTotalSales() {
