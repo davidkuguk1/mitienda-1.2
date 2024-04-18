@@ -1,0 +1,108 @@
+// if(monthlySalesMap.has(newMonth.value)){
+    //   let currentMonthlySales = monthlySalesMap.get(newMonth.value);
+    //   if(currentMonthlySales.has(newProduct.value)){
+    //     //caso 3 mes registrado y la categoria
+    //     //recuperar la cantidad en la base a la categoria
+    //     //sumar la nueva cantidad a la recuperada
+    //     //registrar en el mapa la suma de ambas cantidades
+    //   }else{
+    //     //caso 2 tenemos registrado el mes pero no la categoria
+    //     //añadir la cantidad al mapa que acabamos de recuperar
+    //     //
+    //     //
+    //   }
+    // }else{
+    //   //caso1 no tenemos ni el producto ni el mapa
+    //   //crear un nuevo mapa
+    //   // insertar la cantidad con la clave de la categoria en el mapa
+    //   // insertar este mapa en el mapa principal con clave el mes que acabamos de recibir
+    // }
+
+
+
+
+    		//insertar la venta en la estructura de mapas
+	// if(monthlySalesMap.has(newMonth.value)){
+	// 	let productsMap = monthlySalesMap.get(newMonth.value);
+	// 	if(productsMap.has(product.value)){
+	// 		let quantity = productsMap.get(product.value);
+	// 		quantity += newAmount.value;
+	// 		productsMap.set(product.value, quantity)
+	// 	}else{
+	// 		const productMap = new Map();
+	// 		productMap.set(product.value, newAmount.value);
+	// 		monthlySalesMap.set(newMonth.value,);
+	// 	}
+	//   }else{
+	// 	const newMonthMap = new Map();
+	// 	newMonthMap.set(produc.value, newAmount.value);
+	// 	monthlySalesMap.set(newMonth.value, newMonthMap);
+	// }
+
+
+    function addSale() {
+	try {
+		//validacion de los datos recogidos desde el formulario
+		if (newMonth.value === "")
+			throw {
+				name: "MonthError",
+				message: "El mes esta vacio",
+			};
+		//validar todos los inputs del formulario
+		if (newAmount.value === "")
+			throw {
+				name: "AmonthError",
+				message: "La cantidad esta vacia",
+			};
+
+		//comprobamos los radiobuttons
+		let radioSelected = false;
+		for (let i = 0; i < radioButtons.length; i++) {
+			if (radioButtons[i].checked) {
+				radioSelected = true;
+				break;
+			}
+		}
+
+		if (!radioSelected)
+			throw {
+				name: "bRadioError",
+				message: "Debe seleccionar al menos un elemento",
+			};
+
+
+		//actualizar los totales
+    initMonthlyTotalSales(); //rediseñando para recuperar los totales de la estructura de mapas tendriamos una estructura de bucles anidad o de llamada al metodo forEach();
+		//actualizar las graficas
+	} catch (error) {
+		alert(error.message);
+	}finally {
+		// Reseteo de formulario
+		cleanAddSaleForm();
+	}
+
+	try {
+		// Validación de datos de entrada
+		if (monthlySalesMap.has(newMonth.value)) {
+			let currentValue = monthlySalesMap.get(newMonth.value);
+			let newValue = currentValue + Number.parseInt(newAmount.value);
+			monthlySalesMap.set(newMonth.value, newValue);			
+		}
+		
+		monthlySalesMap.set(newMonth.value, Number.parseInt(newAmount.value));
+		// Recuento de totales
+		initMonthlyTotalSales();
+		// Actualizar gráfico
+		monthlySalesChart.data.datasets[0].data = Array.from(
+			monthlySalesMap.values()
+		);
+		monthlySalesChart.data.labels = Array.from(monthlySalesMap.keys());
+		monthlySalesChart.update();
+	} catch (error) {
+		// Tratamiento de excepciones
+		alert(error.message);
+	} finally {
+		// Reseteo de formulario
+		cleanAddSaleForm();
+	}
+}
