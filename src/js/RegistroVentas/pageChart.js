@@ -247,7 +247,6 @@ function updateCharts() {
 	monthlySalesChart.data.labels = Array.from(monthlySalesMap.keys());
 	monthlySalesChart.update();
 	//actualizar la grafica de ventas por departamento
-	// Actualizar gráfico de ventas por departamento
 	deptSalesChart.data.datasets[0].data = calculateTotalSales();
 	deptSalesChart.update();
 }
@@ -257,13 +256,34 @@ function cleanAddSaleForm() {
 	newAmount.value = "";
 }
 
-//Resetear datos en los gráficos
+// //Resetear datos en los gráficos
+// function resetMonthlySales() {
+// 	monthlySalesArray.length = 0;
+// 	monthlyLabelsSet.clear();
+// 	monthlySalesChart.update();
+// 	initMonthlyTotalSales();
+// }
 function resetMonthlySales() {
-	monthlySalesArray.length = 0;
-	monthlyLabelsSet.clear();
-	monthlySalesChart.update();
+	// Limpiar el mapa de ventas mensuales
+	monthlySalesMap.clear();
+
+	// Restaurar arrays de ventas mensuales a cero
+	monthlySalesCamera.fill(0);
+	monthlySalesLaptop.fill(0);
+	monthlySalesPhone.fill(0);
+	monthlySalesTablet.fill(0);
+
+	// Establecer todos los valores de los conjuntos de datos del gráfico a cero
+	for (let dataset of monthlySalesChart.data.datasets) {
+		dataset.data.fill(0);
+	}
+
+	// Recalcular totales y actualizar gráficos
 	initMonthlyTotalSales();
+	updateCharts();
 }
+
+
 
 function getSalesMonths() {
 	monthlyLabelsSet.forEach(function (month) {
@@ -317,36 +337,48 @@ function calculateTotalSales() {
 let totalDeptSales = calculateTotalSales();
 
 // Actualizar datos del gráfico de sectores
-deptSalesChart.data.datasets[0].data = totalDeptSales;
-deptSalesChart.update();
+// deptSalesChart.data.datasets[0].data = totalDeptSales;
+// deptSalesChart.update();
 
+// Funciones
 function drawSelectMontlySales() {
-	// Seleccionamos elemento usando id con jQuery
-	let removeSales = $("#removeSales");
-	// Eliminamos option del select.
-	removeSales.empty();
-	for (let [month, amount] of monthlySalesMap.entries()) {
-		// Creamos elemento option con jQuery
-		let opt = $("<option>")
-			.val(month)
-			.text(month + ": " + amount);
-		// Añadimos elemento al select.
-		removeSales.append(opt);
+	monthSelect.innerHTML = ""; // Limpiar el select
+  
+	for (let [month, amount] of monthSalesMap.entries()) {
+	  const option = document.createElement("option");
+	  option.value = month;
+	  option.textContent = `${month}: ${amount}`;
+	  monthSelect.appendChild(option);
 	}
-}
-
-// Borrar meses de la colección
-function removeMonthlySale() {
-	let removeSales = document.getElementById("removeSales");
-	// Borramos de la colección la venta.
-	monthlySalesMap.delete(removeSales.value);
-	// Actualizamos colección en el gráfico
-	monthlySalesChart.data.datasets[0].data = Array.from(
-		monthlySalesMap.values()
-	);
-	monthlySalesChart.data.labels = Array.from(monthlySalesMap.keys());
-	monthlySalesChart.update();
-	// Actualizasmos la vista
-	initMonthlyTotalSales();
-	drawSelectMontlySales();
+  }
+  
+  function removeMonthlySale() {
+	const selectedMonth = monthSelect.value;
+	const selectedType = [...radioButtons].find(radio => radio.checked).value;
+  
+	if (!selectedMonth || !selectedType) {
+	  alert("Selecciona un mes y un tipo de venta para eliminar.");
+	  return;
+	}
+  
+	if (!monthSalesMap.has(selectedMonth)) {
+	  alert(`No hay ventas del tipo ${selectedType} en el mes ${selectedMonth}.`);
+	  return;
+	}
+  
+	// Eliminar la venta del tipo seleccionado del mes seleccionado
+	switch (selectedType) {
+	  case "camera":
+		monthlySalesCamera[monthLabels.indexOf(selectedMonth)] -= monthSalesMap.get(selectedMonth);
+		break;
+	  case "laptop":
+		monthlySalesLaptop[monthLabels.indexOf(selectedMonth)] -= monthSalesMap.get(selectedMonth);
+		break;
+	  case "phone":
+		monthlySalesPhone[monthLabels.indexOf(selectedMonth)] -= monthSalesMap.get(selectedMonth);
+		break;
+	  case "tablet":
+		monthlySalesTablet[monthLabels.indexOf(selectedMonth)] -= monthSalesMap.get(selectedMonth);
+		break;
+	}
 }
